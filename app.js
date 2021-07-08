@@ -60,11 +60,25 @@ app.get('/campgrounds/:id/edit', async (req, res) => {
     res.render('campgrounds/edit', { campground });
 })
 
+app.put('/campgrounds/:id', async (req, res) => {
+    // console.log(req.body);
+    // res.send('PUT');
+    const { id } = req.params;
+    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+    res.redirect(`/campgrounds/${campground._id}`)
+})
+
+app.delete('/campgrounds/:id', async (req, res) => {
+    const { id } = req.params;
+    await Campground.findByIdAndDelete(id);
+    res.redirect('/campgrounds');
+})
+
 app.post('/campgrounds', async (req, res) => {
     // res.send(req.body) // create a path
     const newCampground = new Campground(req.body.campground)
     await newCampground.save();
-    console.log(newCampground)
+    // console.log(newCampground)
     // res.send('making new product')
     res.redirect(`/campgrounds/${newCampground._id}`)
 })

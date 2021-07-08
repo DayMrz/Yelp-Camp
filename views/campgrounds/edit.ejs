@@ -12,7 +12,7 @@
 
 
 
-    <h1>Edit Product</h1>
+    <h1>Edit Campground</h1>
     <form action="/campgrounds/<%=campground.id%>?_method=PUT" method="POST">
 
         <label for="title">Title</label>
@@ -20,10 +20,11 @@
         <label for="location">Location</label>
         <input type="text" id="location" name="campground[location]" value="<%=campground.location%>">
 
-        <button>Add campground</button>
+        <button>Update Campground</button>
+
     </form>
 
-    <a href="/campgrounds"> All Campgrounds</a>
+    <a href="/campgrounds/<%=campground._id%>">Back To Campgrounds</a>
 
 
 
