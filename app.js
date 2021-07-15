@@ -81,14 +81,23 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res, next) => {
 
 app.post('/campgrounds', catchAsync(async (req, res, next) => {
     // res.send(req.body) // create a path
+    if (!req.body.campground) throw new ExpressError('Invalid Campground Data')
     const newCampground = new Campground(req.body.campground)
     await newCampground.save();
     res.redirect(`/campgrounds/${newCampground._id}`)
     // res.send('making new product')
 }))
 
+app.all('*', (req, res, next) => {
+    // res.send("404!!")
+    next(new ExpressError('Page Not Found', 404))
+
+})
+
 app.use((err, req, res, next) => {
-    res.send('Something Went Wrong')
+    const { statusCode = 500, message = 'Something Went Wrong' } = err
+    res.status(statusCode).send(message)
+    // res.send('Ohh no, Something Went Wrong!')
 })
 
 
