@@ -3,6 +3,7 @@ const app = express(); //1
 const path = require('path'); //1
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
+const Joi = require('joi');
 
 const Campground = require('./models/campground');
 const methodOverride = require('method-override');
@@ -44,6 +45,8 @@ app.get('/', (req, res) => { //1
 //     res.send(camp)
 // })
 
+
+
 app.get('/campgrounds', async (req, res) => {
     const campgrounds = await Campground.find({})
     res.render('campgrounds/index', { campgrounds })
@@ -81,7 +84,19 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res, next) => {
 
 app.post('/campgrounds', catchAsync(async (req, res, next) => {
     // res.send(req.body) // create a path
-    if (!req.body.campground) throw new ExpressError('Invalid Campground Data')
+    // if (!req.body.campground) throw new ExpressError('Invalid Campground Data')
+    const campgroundSchema = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0)
+        }).required()
+    })
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(element => element.message).join(',')
+        throw new ExpressError(msg, 400)
+    }
+    console.log(result);
     const newCampground = new Campground(req.body.campground)
     await newCampground.save();
     res.redirect(`/campgrounds/${newCampground._id}`)
