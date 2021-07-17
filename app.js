@@ -3,7 +3,7 @@ const app = express(); //1
 const path = require('path'); //1
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const Joi = require('joi');
+const { campgroundSchema } = require('./schemas')
 
 const Campground = require('./models/campground');
 const methodOverride = require('method-override');
@@ -45,6 +45,17 @@ app.get('/', (req, res) => { //1
 //     res.send(camp)
 // })
 
+const validateCampground = (req, res, next) => {
+
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(element => element.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+    // console.log(result);
+}
 
 
 app.get('/campgrounds', async (req, res) => {
@@ -55,6 +66,15 @@ app.get('/campgrounds', async (req, res) => {
 app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new')
 })
+
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
+    // res.send(req.body) // create a path
+    // if (!req.body.campground) throw new ExpressError('Invalid Campground Data')
+    const newCampground = new Campground(req.body.campground)
+    await newCampground.save();
+    res.redirect(`/campgrounds/${newCampground._id}`)
+    // res.send('making new product')
+}))
 
 app.get('/campgrounds/:id', catchAsync(async (req, res, next) => {
     const { id } = req.params;
@@ -68,7 +88,7 @@ app.get('/campgrounds/:id/edit', catchAsync(async (req, res, next) => {
     res.render('campgrounds/edit', { campground });
 }));
 
-app.put('/campgrounds/:id', catchAsync(async (req, res, next) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res, next) => {
     // console.log(req.body);
     // res.send('PUT');
     const { id } = req.params;
@@ -80,27 +100,6 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
-}))
-
-app.post('/campgrounds', catchAsync(async (req, res, next) => {
-    // res.send(req.body) // create a path
-    // if (!req.body.campground) throw new ExpressError('Invalid Campground Data')
-    const campgroundSchema = Joi.object({
-        campground: Joi.object({
-            title: Joi.string().required(),
-            price: Joi.number().required().min(0)
-        }).required()
-    })
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(element => element.message).join(',')
-        throw new ExpressError(msg, 400)
-    }
-    console.log(result);
-    const newCampground = new Campground(req.body.campground)
-    await newCampground.save();
-    res.redirect(`/campgrounds/${newCampground._id}`)
-    // res.send('making new product')
 }))
 
 app.all('*', (req, res, next) => {
