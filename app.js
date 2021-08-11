@@ -6,6 +6,7 @@ const ejsMate = require('ejs-mate');
 const { campgroundSchema } = require('./schemas')
 
 const Campground = require('./models/campground');
+const Review = require('./models/review');
 const methodOverride = require('method-override');
 // const { truncate } = require('fs');
 const ExpressError = require('./Utilities/ExpressError');
@@ -55,7 +56,7 @@ const validateCampground = (req, res, next) => {
         next();
     }
     // console.log(result);
-}
+};
 
 
 app.get('/campgrounds', async (req, res) => {
@@ -65,7 +66,7 @@ app.get('/campgrounds', async (req, res) => {
 
 app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new')
-})
+});
 
 app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
     // res.send(req.body) // create a path
@@ -74,7 +75,7 @@ app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) =
     await newCampground.save();
     res.redirect(`/campgrounds/${newCampground._id}`)
     // res.send('making new product')
-}))
+}));
 
 app.get('/campgrounds/:id', catchAsync(async (req, res, next) => {
     const { id } = req.params;
@@ -94,28 +95,39 @@ app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res, next
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
     res.redirect(`/campgrounds/${campground._id}`)
-}))
+}));
 
 app.delete('/campgrounds/:id', catchAsync(async (req, res, next) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+}));
+
+app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+    // res.send('YAY, here we go!')
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await campground.save();
+    await review.save();
+    res.redirect(`/campgrounds/${campground._id}`)
 }))
+
 
 app.all('*', (req, res, next) => {
     // res.send("404!!")
     next(new ExpressError('Page Not Found', 404))
 
-})
+});
 
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;
     if (!err.message) err.message = 'Oh no, Something Went Wrong!'
     res.status(statusCode).render('error', { err })
     // res.send('Ohh no, Something Went Wrong!')
-})
+});
 
 
 app.listen(3000, () => {//1
     console.log('APP LISTENING ON PORT 3000')//1
-})
+});
