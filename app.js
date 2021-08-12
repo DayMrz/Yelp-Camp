@@ -3,7 +3,7 @@ const app = express(); //1
 const path = require('path'); //1
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const { campgroundSchema } = require('./schemas')
+const { campgroundSchema, reviewSchema } = require('./schemas')
 
 const Campground = require('./models/campground');
 const Review = require('./models/review');
@@ -58,6 +58,17 @@ const validateCampground = (req, res, next) => {
     // console.log(result);
 };
 
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        console.log(error)
+        const msg = error.details.map(element => element.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+};
+
 
 app.get('/campgrounds', async (req, res) => {
     const campgrounds = await Campground.find({})
@@ -103,13 +114,13 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res, next) => {
     res.redirect('/campgrounds');
 }));
 
-app.post('/campgrounds/:id/reviews', catchAsync(async (req, res) => {
+app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
     // res.send('YAY, here we go!')
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
     campground.reviews.push(review);
-    await campground.save();
     await review.save();
+    await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
