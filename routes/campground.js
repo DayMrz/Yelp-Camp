@@ -1,5 +1,20 @@
 const express = require('express');
 const router = express.Router()
+const catchAsync = require('../Utilities/catchAsync');
+const ExpressError = require('../Utilities/ExpressError');
+const Campground = require('../models/campground');
+const { campgroundSchema } = require('../schemas')
+
+
+const validateCampground = (req, res, next) => {
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(element => element.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+};
 
 router.get('/', async (req, res) => {
     const campgrounds = await Campground.find({})
@@ -22,7 +37,7 @@ router.get('/:id', catchAsync(async (req, res, next) => {
     res.render('campgrounds/show', { campground })
 }));
 
-app.get('/:id/edit', catchAsync(async (req, res, next) => {
+router.get('/:id/edit', catchAsync(async (req, res, next) => {
     const campground = await Campground.findById(req.params.id)
     res.render('campgrounds/edit', { campground });
 }));
