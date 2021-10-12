@@ -5,10 +5,13 @@ const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const session = require('express-session');
-const flash = require('connect-flash')
+const flash = require('connect-flash');
+const passport = require('passport');
+const localStrategy = require('passport-local');
+const User = require('./models/user');
+
 
 const ExpressError = require('./Utilities/ExpressError');
-
 
 const campgrounds = require('./routes/campground');
 const reviews = require('./routes/review');
@@ -46,10 +49,22 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash())
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error')
+    res.locals.error = req.flash('error');
     next();
+})
+
+app.get('/fakeUser', async (req, res) => {
+    const user = new User({ email: 'daymrz@gmail.com', username: 'FryDay' });
+    const newUser = await User.register(user, 'xxx123');
+    res.send(newUser);
 })
 
 app.use('/campgrounds', campgrounds);
