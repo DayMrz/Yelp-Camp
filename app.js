@@ -52,9 +52,11 @@ app.use(flash())
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(new localStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');
@@ -62,11 +64,11 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get('/fakeUser', async (req, res) => {
-    const user = new User({ email: 'daymrz@gmail.com', username: 'FryDay' });
-    const newUser = await User.register(user, 'xxx123');
-    res.send(newUser);
-})
+// app.get('/fakeUser', async (req, res) => {
+//     const user = new User({ email: 'daymrz@gmail.com', username: 'FryDay' });
+//     const newUser = await User.register(user, 'xxx123');
+//     res.send(newUser);
+// })
 
 app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
