@@ -10,7 +10,6 @@ const passport = require('passport');
 const localStrategy = require('passport-local');
 const User = require('./models/user');
 
-
 const ExpressError = require('./Utilities/ExpressError');
 
 const userRoutes = require('./routes/users');
