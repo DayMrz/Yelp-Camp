@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const catchAsync = require('../Utilities/catchAsync');
-const {validateReview, isLoggedIn, isReviewAuthor} = require('../middleware')
+const {validateReview, isLoggedIn, isReviewAuthor} = require('../middleware');
+
 
 const reviews = require('../controllers/review')
 
