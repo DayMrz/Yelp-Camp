@@ -4,7 +4,12 @@ const Review = require('./review')
 
 const CampgroundSchema = new Schema({
     title: String,
-    image: String,
+    images: [
+        { 
+            url: String,
+            filename: String
+        }
+    ],
     price: Number,
     description: String,
     location: String,
@@ -21,8 +26,6 @@ const CampgroundSchema = new Schema({
 });
 
 CampgroundSchema.post('findOneAndDelete', async function (doc) {
-    // console.log("Delete!")
-    // console.log(doc)
     if (doc) {
         await Review.deleteMany({
             _id: {

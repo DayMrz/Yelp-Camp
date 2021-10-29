@@ -4,7 +4,9 @@
 <div class="row">
     <div class="col-6">
         <div class="card mb-3 ">
-            <img src="<%=campground.image%>" class="card-img-top" alt="...">
+            <% for(let img of campground.images)  { %>
+                <img src="<%=img.url%>" class="card-img-top" alt="...">
+            <% } %>  
             <div class="card-body">
                 <h5 class="card-title"><%=campground.title%></h5>
                 <p class="card-text"><%=campground.description%></p>
@@ -33,11 +35,8 @@
         <% if(currentUser) {%>
         <h2>Leave a Review</h2>
         <form action="/campgrounds/<%=campground._id%>/reviews" method="POST" novalidate class="mb-3 validate-form">
-            <div class="mb-3">
-                <!-- <label class="form-label" for="rating">rating</label> -->
-                <fieldset class="starability-growRotate form-range">
-                    <legend>Rating:</legend>
-                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                <fieldset class="starability-basic">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating."/>
                     <input type="radio" id="first-rate1" name="review[rating]" value="1" />
                     <label for="first-rate1" title="Terrible">1 star</label>
                     <input type="radio" id="first-rate2" name="review[rating]" value="2" />
@@ -49,7 +48,6 @@
                     <input type="radio" id="first-rate5" name="review[rating]" value="5" />
                     <label for="first-rate5" title="Amazing">5 stars</label>
                 </fieldset>
-            </div>
             <div class="mb-3">
                 <label class="form-label" for="body">Review Text:</label>
                 <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
