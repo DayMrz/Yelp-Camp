@@ -18,15 +18,6 @@
                         Looks good!
                     </div>
                 </div>
-
-                <input type="file" name="image" multiple>
-                <div class="mb-3">
-                    <!-- <label class="form-label" for="image"> Image URL </label>
-                    <input class="form-control" type="text" id="image" name="campground[image]" required>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-                </div> -->
                 <div class="mb-3">
                     <label class="form-label" for="price">Campground Price</label>
                     <div class="input-group">
@@ -38,13 +29,19 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="mb-3">
+                    <label for="image" class="form-label">Add Images
+                    </label>
+                    <input type="file" name="image" class="form-control" id="image" required multiple>
+                    <div class="invalid-feedback">
+                        a picture will make this campground more attractive
+                    </div>
+                </div>
                 <div class="mb-3">
                     <label class="form-label" for="description"> Description </label>
                     <textarea class="form-control" type="text" id="description" required
                         name="campground[description]"></textarea>
                 </div>
-
                 <div class="mb-3">
                     <button class="btn btn-success">Add campground</button>
                 </div>
