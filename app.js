@@ -2,9 +2,6 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-// console.log(process.env.CLOUDINARY_CLOUD_NAME);
-// console.log(process.env.CLOUDINARY_KEY);
-// console.log(process.env.CLOUDINARY_SECRET);
 
 const express = require('express');
 const app = express();
@@ -17,7 +14,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const localStrategy = require('passport-local');
 const User = require('./models/user');
-
+const mongoSanitize = require('express-mongo-sanitize');
 
 const ExpressError = require('./Utilities/ExpressError');
 
@@ -44,17 +41,23 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(mongoSanitize({
+    replaceWith: '_',
+    }));
 
 const sessionConfig = {
+    name: 'session',
     secret: 'isnotasecret',
     resave: false,
     saveUninitialized: true,
     cookie: {
         HttpOnly: true,
+        // secure: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
+
 app.use(session(sessionConfig));
 app.use(flash())
 
